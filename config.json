@@ -23,6 +23,64 @@
         },
         "next_page": {
             "class": "next"
+        },
+        "laptop_title": {
+            "class": "entry-title"
+        },
+        "lot-closing-countdown": {
+            "id": "lot-closing-countdown"
+        },
+        "current-bid": {
+            "class": "current-bid"
+        },
+        "lot-quantity": {
+            "class": "lot-qty"
+        },
+        "lot-number": {
+            "attribute": "@itemprop='identifier'",
+            "tag": "span"
+        },
+        "lot-details": {
+            "class": "lot-details"
+        },
+        "lot-condition": {
+            "attribute": "@title='Learn more about Condition'",
+            "tag": "a"
+        },
+        "lot-premium": {
+            "attribute": "@title='Learn more about Buyers Premium'",
+            "tag": "a"
+        },
+        "lot-gst": {
+            "attribute": "@title='Learn more about GST'",
+            "tag": "a"
+        },
+        "lot-warranty": {
+            "class": "warranty-link"
+        },
+        "lot-description": {
+            "id": "tabpage_Description"
+        },
+        "bidding_history": {
+             "id": "tab_Bidding_History"
+        },
+        "bidding_table": {
+             "tag_name": "tbody"
+        },
+        "bidding-details": {
+             "class": "bidding-details"
+        },
+        "bid-time": {
+             "class": "bid-time"
+        },
+        "bid-price": {
+             "class": "bid-price"
+        },
+        "bid-qty": {
+             "class": "bid-qty"
+        },
+        "win-qty": {
+             "class": "win-qty"
         }
     }
 }
