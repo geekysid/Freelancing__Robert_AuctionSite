@@ -1,0 +1,28 @@
+{
+    "base_url": "https://www.grays.com/",
+	"url": ["https://www.grays.com/computers-and-electronics/computers-and-it-equipment/laptops?item-type=auction"],
+    "selectors": {
+        "result_page_load_wait": {
+            "id": "page-size"
+        },
+        "items_per_page": {
+            "id": "page-size"
+        },
+        "auction_search_results_container": {
+            "class": "item-search-results"
+        },
+        "individual_laptop_column": {
+            "class": "s3rw"
+        },
+        "individual_laptop_url": {
+            "class": "si-link",
+            "tag": "a"
+        },
+        "page_container": {
+            "class": "pager"
+        },
+        "next_page": {
+            "class": "next"
+        }
+    }
+}
