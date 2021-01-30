@@ -1,6 +1,32 @@
 {
+
     "base_url": "https://www.grays.com/",
-	"url": ["https://www.grays.com/computers-and-electronics/computers-and-it-equipment/laptops?item-type=auction"],
+    "auction_and_lot_details": [
+        [2182381, 1, 100],
+        [2182305, 1, 100],
+        [2182306, 1, 100],
+        [2182307, 1, 100],
+        [2182384, 1, 100],
+        [2182380, 1, 100],
+        [2182385, 1, 100],
+        [2182381, 1, 100],
+        [2182504, 1, 100]
+    ],
+    "Processor": [
+        "core", "GHz", "Core"
+    ],
+    "Memory": [
+        "RAM"
+    ],
+    "Storage": [
+        "Hard Drive", "Hard Drives", "Storage", "SSD", "Solid State Drive", "Solid State Drives"
+    ],
+    "Part": [
+        "Part Number", "Part No", "Part Num"
+    ],
+	"url": [
+        "https://www.grays.com/computers-and-electronics/computers-and-it-equipment/laptops?item-type=auction"
+    ],
     "selectors": {
         "result_page_load_wait": {
             "id": "page-size"
@@ -24,11 +50,17 @@
         "next_page": {
             "class": "next"
         },
+        "has_closed": {
+            "class": "lot-closed-message"
+        },
         "laptop_title": {
             "class": "entry-title"
         },
         "lot-closing-countdown": {
             "id": "lot-closing-countdown"
+        },
+        "lot-closed-on": {
+            "class": "endtime"
         },
         "current-bid": {
             "class": "current-bid"
@@ -81,6 +113,9 @@
         },
         "win-qty": {
              "class": "win-qty"
+        },
+        "bid_next_page": {
+            "id": "DataTables_Table_0_next"
         }
     }
 }
