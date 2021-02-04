@@ -1,0 +1,91 @@
+{
+  "result_page_load_wait": {
+    "id": "page-size"
+  },
+  "items_per_page": {
+    "id": "page-size"
+  },
+  "auction_search_results_container": {
+    "class": "item-search-results"
+  },
+  "individual_laptop_column": {
+    "class": "s3rw"
+  },
+  "individual_laptop_url": {
+    "class": "si-link",
+    "tag": "a"
+  },
+  "page_container": {
+    "class": "pager"
+  },
+  "next_page": {
+    "class": "next"
+  },
+  "has_closed": {
+    "class": "lot-closed-message"
+  },
+  "laptop_title": {
+    "class": "entry-title"
+  },
+  "lot-closing-countdown": {
+    "id": "lot-closing-countdown"
+  },
+  "lot-closed-on": {
+    "class": "endtime"
+  },
+  "current-bid": {
+    "class": "current-bid"
+  },
+  "lot-quantity": {
+    "class": "lot-qty"
+  },
+  "lot-number": {
+    "attribute": "@itemprop='identifier'",
+    "tag": "span"
+  },
+  "lot-details": {
+    "class": "lot-details"
+  },
+  "lot-condition": {
+    "attribute": "@title='Learn more about Condition'",
+    "tag": "a"
+  },
+  "lot-premium": {
+    "attribute": "@title='Learn more about Buyers Premium'",
+    "tag": "a"
+  },
+  "lot-gst": {
+    "attribute": "@title='Learn more about GST'",
+    "tag": "a"
+  },
+  "lot-warranty": {
+    "class": "warranty-link"
+  },
+  "lot-description": {
+    "id": "tabpage_Description"
+  },
+  "bidding_history": {
+    "id": "tab_Bidding_History"
+  },
+  "bidding_table": {
+    "class": "lot-bid-history"
+  },
+  "bidding-details": {
+    "class": "bidding-details"
+  },
+  "bid-time": {
+    "class": "bid-time"
+  },
+  "bid-price": {
+    "class": "bid-price"
+  },
+  "bid-qty": {
+    "class": "bid-qty"
+  },
+  "win-qty": {
+    "class": "win-qty"
+  },
+  "bid_next_page": {
+    "id": "DataTables_Table_0_next"
+  }
+}

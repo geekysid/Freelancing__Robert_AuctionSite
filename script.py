@@ -18,7 +18,8 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from colorama import init
 from termcolor import cprint
-import time, json, os, sys
+import pandas as pd
+import xlsxwriter, time, json, os, sys
 
 
 # global variables
@@ -52,6 +53,17 @@ def initializer():
     if os.path.exists(f'{os.getcwd()}/config.json'):
         with open (f'{os.getcwd()}/config.json', 'r') as r:
             CONFIG_DATA = json.load(r)
+
+        if os.path.exists(f'{os.getcwd()}/selectors.json'):
+            with open (f'{os.getcwd()}/selectors.json', 'r') as r:
+                CONFIG_DATA['selectors'] = json.load(r)
+                return True
+        else:
+            cprint(f'\n  [X] SELECTOR CONFIG FILE DOSEN\'T EXISTS. TERMINATIING SCRIPT.', 'red', attrs=['bold'])
+            return False
+    else:
+        cprint(f'\n  [X] CONFIG FILE DOSEN\'T EXISTS. TERMINATIING SCRIPT.', 'red', attrs=['bold'])
+        return False
 
 
 # Setting up webdriver
@@ -125,32 +137,6 @@ def check_if_substring_exists(substringArr, bigString):
     return False
 
 
-# details of lapt that is being auctioned
-def get_autioned_laptop_details(selector):
-    description = get_element(selector['lot-description']).find_elements_by_tag_name('li')
-    laptop_details = {}
-
-    for desc in description:
-        text = desc.text
-        if check_if_substring_exists(CONFIG_DATA['Memory'], text):
-            laptop_details['Memory'] = text
-            cprint(f'          [>>] Memory: {text}', 'cyan', attrs=['bold'])
-
-        if check_if_substring_exists(CONFIG_DATA['Part'], text):
-            laptop_details['Part Number'] = text
-            cprint(f'          [>>] Part Number: {text}', 'cyan', attrs=['bold'])
-
-        if check_if_substring_exists(CONFIG_DATA['Storage'], text):
-            laptop_details['Storage'] = text
-            cprint(f'          [>>] Storage: {text}', 'cyan', attrs=['bold'])
-
-        if check_if_substring_exists(CONFIG_DATA['Processor'], text):
-            laptop_details['Processor'] = text
-            cprint(f'          [>>] Processor: {text}', 'cyan', attrs=['bold'])
-
-    DATA[BROWSER.current_url.rsplit("/", 1)[-1]]['laptop_details'] = laptop_details
-
-
 # details of bidding for the laptop
 def get_bidding_details(selector):
     global DATA
@@ -160,40 +146,77 @@ def get_bidding_details(selector):
     bidding_details = []
     bid_count = 0
     while True:
+        # time.sleep(1)
         bidding_rows = get_element(selector['bidding_table']).find_elements_by_tag_name('tr')
-        for bidding_row in bidding_rows:
-            try:
-                details = bidding_row.find_element_by_class_name(selector['bidding-details']['class']).text
-                time_ = bidding_row.find_element_by_class_name(selector['bid-time']['class']).text
-                price = bidding_row.find_element_by_class_name(selector['bid-price']['class']).text
-                bid_qty = bidding_row.find_element_by_class_name(selector['bid-qty']['class']).text
-                win_qty = bidding_row.find_element_by_class_name(selector['win-qty']['class']).text
-                bid_count+= 1
+        if len(bidding_rows) > 0:
+            for bidding_row in bidding_rows[1:]:
+                try:
+                    details = bidding_row.find_element_by_class_name(selector['bidding-details']['class']).text
+                    time_ = bidding_row.find_element_by_class_name(selector['bid-time']['class']).text
+                    price = bidding_row.find_element_by_class_name(selector['bid-price']['class']).text
+                    bid_qty = bidding_row.find_element_by_class_name(selector['bid-qty']['class']).text
+                    win_qty = bidding_row.find_element_by_class_name(selector['win-qty']['class']).text
+                    bid_count+= 1
 
-                cprint(f'          [>>] Bid # {bid_count}', 'cyan', attrs=['bold'])
-                cprint(f'              [>>>] Bidder: {details}', 'cyan', attrs=['bold'])
-                cprint(f'              [>>>] Bid Time: {time_}', 'cyan', attrs=['bold'])
-                cprint(f'              [>>>] Bid Price: {price}', 'cyan', attrs=['bold'])
-                cprint(f'              [>>>] Bid Qty: {bid_qty}', 'cyan', attrs=['bold'])
-                cprint(f'              [>>>] Win Qty: {win_qty}', 'cyan', attrs=['bold'])
-                bidding_details.append({
-                    "Bidder": details,
-                    "Bidding Time": time_,
-                    "Bidding Price": price,
-                    "Bid Quantity": bid_qty,
-                    "Win Quantity": win_qty
-                })
+                    # cprint(f'          [>>] Bid # {bid_count}', 'cyan', attrs=['bold'])
+                    # cprint(f'              [>>>] Bidder: {details}', 'cyan', attrs=['bold'])
+                    # cprint(f'              [>>>] Bid Time: {time_}', 'cyan', attrs=['bold'])
+                    # cprint(f'              [>>>] Bid Price: {price}', 'cyan', attrs=['bold'])
+                    # cprint(f'              [>>>] Bid Qty: {bid_qty}', 'cyan', attrs=['bold'])
+                    # cprint(f'              [>>>] Win Qty: {win_qty}', 'cyan', attrs=['bold'])
+                    bidding_details.append({
+                        "Bid Count": bid_count,
+                        "Bidder": details,
+                        "Bidding Time": time_,
+                        "Bidding Price": price,
+                        "Bid Quantity": bid_qty,
+                        "Win Quantity": win_qty
+                    })
+                except Exception as err:
+                    # input(str(err))
+                    cprint(f'          [>>] No Bids Found', 'red', attrs=['bold'])
+            try:
+                next_page = get_element(selector['bid_next_page'])
+                next_page.click()
             except:
-                cprint(f'          [>>] No Bids Found', 'red', attrs=['bold'])
-        try:
-            next_page = get_element(selector['bid_next_page'])
-            next_page.click()
-        except:
-            # cprint(f'          [x] Next Page not found.', '', attrs=['bold'])
-            break
+                # cprint(f'          [x] Next Page not found.', '', attrs=['bold'])
+                break
 
     DATA[BROWSER.current_url.rsplit("/", 1)[-1]]['bidding_details'] = bidding_details
     DATA[BROWSER.current_url.rsplit("/", 1)[-1]]['auction_details']['Total Bids'] = len(bidding_details)
+    cprint(f'          [>>] Bid Count # {len(bidding_details)}', 'cyan', attrs=['bold'])
+
+
+# details of lapt that is being auctioned
+def get_autioned_laptop_details(selector):
+    description = get_element(selector['lot-description']).find_elements_by_tag_name('li')
+    laptop_details = {}
+    memory = part = processor = storage = None
+
+    for desc in description:
+        text = desc.text
+        if check_if_substring_exists(CONFIG_DATA['Memory'], text):
+            memory = text
+            cprint(f'          [>>] Memory: {memory}', 'cyan', attrs=['bold'])
+
+        if check_if_substring_exists(CONFIG_DATA['Part'], text):
+            part = text.split(': ')[-1]
+            cprint(f'          [>>] Part Number: {part}', 'cyan', attrs=['bold'])
+
+        if check_if_substring_exists(CONFIG_DATA['Storage'], text):
+            processor = text
+            cprint(f'          [>>] Storage: {processor}', 'cyan', attrs=['bold'])
+
+        if check_if_substring_exists(CONFIG_DATA['Processor'], text):
+            storage = text
+            cprint(f'          [>>] Processor: {storage}', 'cyan', attrs=['bold'])
+
+    laptop_details['Memory'] = memory
+    laptop_details['Part Number'] = part
+    laptop_details['Storage'] = processor
+    laptop_details['Processor'] = storage
+
+    DATA[BROWSER.current_url.rsplit("/", 1)[-1]]['laptop_details'] = laptop_details
 
 
 # details fo auctioned
@@ -202,7 +225,8 @@ def get_auction_details(selector, lot_number):
     global INVALID_URL
 
     try:
-        pageExist = WebDriverWait(BROWSER, WAIT_TIME).until(EC.visibility_of_element_located((By.XPATH, '/html/body/div[1]/div[5]/div[2]/div[3]/div/div[1]/div[1]/div[1]/h1')))
+        pageExist = WebDriverWait(BROWSER, WAIT_TIME).until(EC.visibility_of_element_located((By.ID, 'lotDetails')))
+            # /html/body/div[1]/div[5]/div[2]/div[3]/div/div[1]/div[1]/div[1]/h1'
         # print(pageExist.text)
     except:
         pageExist = False
@@ -224,7 +248,8 @@ def get_auction_details(selector, lot_number):
         title = get_element(selector["laptop_title"]).text
         closed_on = get_element(selector["lot-closed-on"]).text if has_closed else 'Auction is Live'
         closing_in = 'Closed' if has_closed else get_element(selector["lot-closing-countdown"]).text
-        status = 'Closed' if has_closed else 'On Going'
+        status = get_element(selector["lot-closed-on"]).text if has_closed else get_element(selector["lot-closing-countdown"]).text
+        # status = 'Closed' if has_closed else 'On Going'
         winning_bid = get_element(selector["current-bid"]).text
         lot_qty = get_element(selector["lot-quantity"]).text
         lot_number = lot_number
@@ -234,7 +259,7 @@ def get_auction_details(selector, lot_number):
         lot_warranty = get_element(selector["lot-warranty"]).text.replace("Warranty:", "").strip()
 
         dev_sup_li = get_element(selector["lot-details"]).find_elements_by_tag_name("ul")[1].find_elements_by_tag_name("li")
-        lot_delivery = dev_sup_li[0].text.replace("Delivery:", "").strip()
+        lot_delivery = dev_sup_li[0].text.replace("Deliver to: ", "").strip()
         lot_support = dev_sup_li[1].text.replace("Support:", "").strip()
 
         cprint(f'          [>>] Auction is {"Closed" if has_closed else "Live"}', 'cyan', attrs=['bold'])
@@ -254,7 +279,7 @@ def get_auction_details(selector, lot_number):
         DATA[BROWSER.current_url.rsplit("/", 1)[-1]]['auction_details'] = {
             "Lot Number": lot_number,
             "Title": title,
-            "Status": closed_on,
+            "Status": status,
             "Winning Bid": winning_bid,
             "Quantity": lot_qty,
             "Lot Condition": lot_condition,
@@ -273,9 +298,115 @@ def get_auction_details(selector, lot_number):
         INVALID_URL += 1
 
 
+# Writing data to excel
+def write_to_excel(worksheet, data_list):
+
+    # Write headers
+    col = 0
+    worksheet.write(0, 0, 'Start')
+    worksheet.write(0, 1, 'Quanitity')
+    for key in data_list[0].keys():
+        worksheet.write(0, col, key)
+        col += 1
+
+    # Write Data
+
+    # Write list data
+    col = 0
+    for i, data_dict in enumerate(data_list, start=1):
+        col = 0
+        for key in data_dict.keys():
+            worksheet.write(i, col, data_dict[key])
+            col += 1
+
+    # col = 0
+    # row = 0
+    # for d in data_list:
+    #     for key in d.keys():
+    #         row += 1
+    #         worksheet.write(row, col, key)
+    #         for item in d[key]:
+    #             worksheet.write(row, col + 1, item)
+    #             row += 1
+
+
+# function that fetches required auction datapoints from json and generates a csv
+def generate_auction_file(workbook):
+    auction_list = []
+    for key in DATA.keys():
+        if DATA[key] == "Page dosen't exists":
+            continue
+        else:
+            auction_list.append({
+                "Colsed": DATA[key]['auction_details']['Status'],
+                "Auction": DATA[key]['auction_details']['Lot Number'].split('-')[-1],
+                "Lot": DATA[key]['auction_details']['Lot Number'].split('-')[0],
+                "Part": DATA[key]['laptop_details']['Part Number'],
+                "Item Name": DATA[key]['auction_details']['Title'],
+                "Bid": DATA[key]['auction_details']['Winning Bid'],
+                "Condition": DATA[key]['auction_details']['Lot Condition'],
+                "Buyers Premium": DATA[key]['auction_details']['Lot Premium'],
+                "GST": DATA[key]['auction_details']['Lot GST'],
+                "Warranty": DATA[key]['auction_details']['Lot Warranty'],
+                "Deliver To": DATA[key]['auction_details']['Lot Delivery'],
+                "Processor": DATA[key]['laptop_details']['Processor'],
+                "Memory": DATA[key]['laptop_details']['Memory'],
+                "Storage": DATA[key]['laptop_details']['Storage']
+            })
+    if len(auction_list) > 0:
+        try:
+            if CONFIG_DATA['output'] == 'csv':
+                pd.DataFrame(auction_list).to_csv(f"{workbook.split('.')[0]}__auctioncsv", index=False)
+            elif CONFIG_DATA['output'] == 'excel':
+                worksheet = workbook.add_worksheet('Auction Data')
+                write_to_excel(worksheet, auction_list)
+                cprint(f'          ✅ Saved auction data to Excel file', 'green', attrs=['bold'])
+        except Exception as err:
+            cprint(f'          ❌ Exception while trying to save auction data into file.', 'red', attrs=['bold'])
+            cprint(f'          ❌ Exception: {str(err)}', 'red', attrs=['bold'])
+
+
+# function that fetches required bidding datapoints from json and generates a csv
+def generate_bidding_file(workbook):
+    bidding_list = []
+    for key in DATA.keys():
+        if DATA[key] == "Page dosen't exists":
+            continue
+        else:
+            if DATA[key]['auction_details']['Total Bids'] > 0:
+
+                auction = DATA[key]['auction_details']['Lot Number'].split('-')[-1]
+                lot = DATA[key]['auction_details']['Lot Number'].split('-')[0]
+
+                for bid in DATA[key]['bidding_details']:
+                    bidding_list.append({
+                        "Auction": auction,
+                        "Lot": lot,
+                        "Bid": bid['Bid Count'],
+                        "Bidding Details": bid['Bidder'],
+                        "Bid Time": bid['Bidding Time'],
+                        "Bid Price": bid['Bidding Price'],
+                        "Bid Qty": bid['Bid Quantity'],
+                        "Win Qty": bid['Win Quantity']
+                    })
+
+    if len(bidding_list) > 0:
+            try:
+            if CONFIG_DATA['output'] == 'csv':
+                pd.DataFrame(bidding_list).to_csv(f"{workbook.split('.')[0]}__bids.csv", index=False)
+            elif CONFIG_DATA['output'] == 'excel':
+                worksheet = workbook.add_worksheet('Bidding Data')
+                write_to_excel(worksheet, bidding_list)
+                cprint(f'          ✅ Saved bidding data to Excel file', 'green', attrs=['bold'])
+        except Exception as err:
+            cprint(f'          ❌ Exception while trying to save bidding data into file.', 'red', attrs=['bold'])
+            cprint(f'          ❌ Exception: {str(err)}', 'red', attrs=['bold'])
+        # pd.DataFrame(bidding_list).to_excel(file, sheet_name='Bids', index=False)
+        # # pd.DataFrame(bidding_list).to_excel(f"{file.split('.')[0]}.xls", sheet_name='Bids', index=False)
+
+
 # Saving data to json file
-def save_data_JSON(auction):
-    file = f'Data/{auction}.json'
+def save_data_JSON(file):
     with open(file, 'w') as f:
         json.dump(DATA, f)
 
@@ -295,7 +426,16 @@ def generate_auctionUrl(selector, auction, start, end):
 
         selector = CONFIG_DATA['selectors']
         get_auction_details(selector, auction_string)
-        save_data_JSON(auction)
+        save_data_JSON(f'Data/{auction}.json')
+
+        workbook = xlsxwriter.Workbook(f'Data/{auction}.xlsx') if CONFIG_DATA['output'].lower()  == 'excel' else None
+        file = f'Data/{auction}.json' if CONFIG_DATA['output'] == 'csv' else workbook
+
+        generate_auction_file(file)
+        generate_bidding_file(file)
+
+        if CONFIG_DATA['output'].lower() == 'excel':
+            workbook.close()
 
         if INVALID_URL == 5:
             break
@@ -303,38 +443,11 @@ def generate_auctionUrl(selector, auction, start, end):
         print('\n----------------\n')
 
 
-# NOT IN USE getting laptops that are on auction
-def get_laptop_on_sale():
-    laptops = set()
-    selector = CONFIG_DATA['selectors']
-    WebDriverWait(BROWSER, WAIT_TIME).until(EC.visibility_of_element_located((By.ID, selector['items_per_page']['id']))).send_keys('100')
-    # WebDriverWait(BROWSER, WAIT_TIME).until(EC.visibility_of_element_located((By.ID, selector['items_per_page']['id'])))
-    time.sleep(5)
-
-    # fetching laptops on auction
-    result_container = get_element(selector['auction_search_results_container'])
-    total_laptops = get_elements(selector['individual_laptop_url'], result_container)
-    for laptop in total_laptops:
-        laptop_url = laptop.get_attribute('href')
-        if 'lot' in laptop_url:
-            laptops.add(laptop_url)
-
-    for laptop_url in laptops:
-        BROWSER.get(laptop_url)
-        get_auction_details()
-        get_autioned_laptop_details()
-        get_bidding_details()
-
-
 # getting required data from website
 def get_required_data():
     selector = CONFIG_DATA['selectors']
     for auction in CONFIG_DATA['auction_and_lot_details']:
         generate_auctionUrl(selector, *auction)
-    # get_laptop_on_sale()
-    # get_heading_section(browser)
-    # get_features_section(browser)
-    # get_specifications(browser)
 
 
 # executing script only if its not imported
@@ -342,13 +455,12 @@ if __name__ == '__main__':
     try:
         init()
         intro_deco()
-        initializer()
-        get_browser(headless=False)
-        get_required_data()
-        BROWSER.quit()
+        if initializer():
+            get_browser(headless=False)
+            get_required_data()
+            BROWSER.quit()
     except Exception as error:
-        input("TTTTTTTTTTTTTTTTTTTTTTT")
+        # input("TTTTTTTTTTTTTTTTTTTTTTT")
         if BROWSER:
             BROWSER.quit()
         cprint(f'  [+] EXCEPTION: {str(error)}', 'red', attrs=['bold'])
-

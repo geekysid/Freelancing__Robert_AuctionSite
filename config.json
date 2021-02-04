@@ -1,121 +1,77 @@
 {
-
-    "base_url": "https://www.grays.com/",
-    "auction_and_lot_details": [
-        [2182381, 1, 100],
-        [2182305, 1, 100],
-        [2182306, 1, 100],
-        [2182307, 1, 100],
-        [2182384, 1, 100],
-        [2182380, 1, 100],
-        [2182385, 1, 100],
-        [2182381, 1, 100],
-        [2182504, 1, 100]
+  "base_url": "https://www.grays.com/",
+  "auction_and_lot_details": [
+    [
+      2182305,
+      1,
+      100
     ],
-    "Processor": [
-        "core", "GHz", "Core"
+    [
+      2182381,
+      1,
+      100
     ],
-    "Memory": [
-        "RAM"
+    [
+      2182306,
+      1,
+      100
     ],
-    "Storage": [
-        "Hard Drive", "Hard Drives", "Storage", "SSD", "Solid State Drive", "Solid State Drives"
+    [
+      2182307,
+      1,
+      100
     ],
-    "Part": [
-        "Part Number", "Part No", "Part Num"
+    [
+      2182384,
+      1,
+      100
     ],
-	"url": [
-        "https://www.grays.com/computers-and-electronics/computers-and-it-equipment/laptops?item-type=auction"
+    [
+      2182380,
+      1,
+      100
     ],
-    "selectors": {
-        "result_page_load_wait": {
-            "id": "page-size"
-        },
-        "items_per_page": {
-            "id": "page-size"
-        },
-        "auction_search_results_container": {
-            "class": "item-search-results"
-        },
-        "individual_laptop_column": {
-            "class": "s3rw"
-        },
-        "individual_laptop_url": {
-            "class": "si-link",
-            "tag": "a"
-        },
-        "page_container": {
-            "class": "pager"
-        },
-        "next_page": {
-            "class": "next"
-        },
-        "has_closed": {
-            "class": "lot-closed-message"
-        },
-        "laptop_title": {
-            "class": "entry-title"
-        },
-        "lot-closing-countdown": {
-            "id": "lot-closing-countdown"
-        },
-        "lot-closed-on": {
-            "class": "endtime"
-        },
-        "current-bid": {
-            "class": "current-bid"
-        },
-        "lot-quantity": {
-            "class": "lot-qty"
-        },
-        "lot-number": {
-            "attribute": "@itemprop='identifier'",
-            "tag": "span"
-        },
-        "lot-details": {
-            "class": "lot-details"
-        },
-        "lot-condition": {
-            "attribute": "@title='Learn more about Condition'",
-            "tag": "a"
-        },
-        "lot-premium": {
-            "attribute": "@title='Learn more about Buyers Premium'",
-            "tag": "a"
-        },
-        "lot-gst": {
-            "attribute": "@title='Learn more about GST'",
-            "tag": "a"
-        },
-        "lot-warranty": {
-            "class": "warranty-link"
-        },
-        "lot-description": {
-            "id": "tabpage_Description"
-        },
-        "bidding_history": {
-             "id": "tab_Bidding_History"
-        },
-        "bidding_table": {
-             "tag_name": "tbody"
-        },
-        "bidding-details": {
-             "class": "bidding-details"
-        },
-        "bid-time": {
-             "class": "bid-time"
-        },
-        "bid-price": {
-             "class": "bid-price"
-        },
-        "bid-qty": {
-             "class": "bid-qty"
-        },
-        "win-qty": {
-             "class": "win-qty"
-        },
-        "bid_next_page": {
-            "id": "DataTables_Table_0_next"
-        }
-    }
+    [
+      2182385,
+      1,
+      100
+    ],
+    [
+      2182381,
+      1,
+      100
+    ],
+    [
+      2182504,
+      1,
+      100
+    ]
+  ],
+  "output": "excel",
+  "Processor": [
+    "core",
+    "GHz",
+    "Core"
+  ],
+  "Memory": [
+    "RAM"
+  ],
+  "Storage": [
+    "Hard Drive",
+    "Hard Drives",
+    "Storage",
+    "SSD",
+    "Solid State Drive",
+    "Solid State Drives",
+    "GB",
+    "TB"
+  ],
+  "Part": [
+    "Part Number",
+    "Part No",
+    "Part Num"
+  ],
+  "url": [
+    "https://www.grays.com/computers-and-electronics/computers-and-it-equipment/laptops?item-type=auction"
+  ]
 }
