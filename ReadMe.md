@@ -98,6 +98,8 @@ This file needs to be edited everytime you run the script and so it needs some e
 
  - **auction_and_lot_details** => List of details of auction and lot number that are to be scrapped.
 
+x - *strip_part_number* => Describes the format of Part Number. If **true** then script will remove any text in parenthesis – for example it will remove “(SN:276354-56)” and “(276354-56)”.
+
  - **output** =>  This is the format in which output is required. It can have a value of *excel* or *csv*.
 
  - **Processor** =>  This is the list of word which allows script to determine if the value belongs to *processor* category. Please add any word if require.

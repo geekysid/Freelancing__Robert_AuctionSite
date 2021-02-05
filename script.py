@@ -197,19 +197,20 @@ def get_autioned_laptop_details(selector):
         text = desc.text
         if check_if_substring_exists(CONFIG_DATA['Memory'], text):
             memory = text
-            cprint(f'          [>>] Memory: {memory}', 'cyan', attrs=['bold'])
 
         if check_if_substring_exists(CONFIG_DATA['Part'], text):
             part = text.split(': ')[-1]
-            cprint(f'          [>>] Part Number: {part}', 'cyan', attrs=['bold'])
 
         if check_if_substring_exists(CONFIG_DATA['Storage'], text):
             processor = text
-            cprint(f'          [>>] Storage: {processor}', 'cyan', attrs=['bold'])
 
         if check_if_substring_exists(CONFIG_DATA['Processor'], text):
             storage = text
-            cprint(f'          [>>] Processor: {storage}', 'cyan', attrs=['bold'])
+
+    cprint(f'          [>>] Memory: {memory}', 'cyan', attrs=['bold'])
+    cprint(f'          [>>] Storage: {processor}', 'cyan', attrs=['bold'])
+    cprint(f'          [>>] Processor: {storage}', 'cyan', attrs=['bold'])
+    cprint(f'          [>>] Part Number: {part}', 'cyan', attrs=['bold'])
 
     laptop_details['Memory'] = memory
     laptop_details['Part Number'] = part
@@ -338,12 +339,13 @@ def generate_auction_file(workbook):
             continue
         else:
             auction_list.append({
-                "Colsed": DATA[key]['auction_details']['Status'],
+                "Closed": DATA[key]['auction_details']['Status'],
+                "Auction-Lot": f"{DATA[key]['auction_details']['Lot Number'].split('-')[-1]}-{DATA[key]['auction_details']['Lot Number'].split('-')[0]}",
                 "Auction": DATA[key]['auction_details']['Lot Number'].split('-')[-1],
                 "Lot": DATA[key]['auction_details']['Lot Number'].split('-')[0],
-                "Part": DATA[key]['laptop_details']['Part Number'],
+                "Part": DATA[key]['laptop_details']['Part Number'].split(" ")[0].strip() if CONFIG_DATA['strip_part_number'] else DATA[key]['laptop_details']['Part Number'],
                 "Item Name": DATA[key]['auction_details']['Title'],
-                "Bid": DATA[key]['auction_details']['Winning Bid'],
+                "Bid": float(DATA[key]['auction_details']['Winning Bid'].replace("$", "").replace("AU", "").replace(" ", "").replace(",", '').strip()),
                 "Condition": DATA[key]['auction_details']['Lot Condition'],
                 "Buyers Premium": DATA[key]['auction_details']['Lot Premium'],
                 "GST": DATA[key]['auction_details']['Lot GST'],
@@ -380,18 +382,19 @@ def generate_bidding_file(workbook):
 
                 for bid in DATA[key]['bidding_details']:
                     bidding_list.append({
+                        "Auction-Lot": f"{DATA[key]['auction_details']['Lot Number'].split('-')[-1]}-{DATA[key]['auction_details']['Lot Number'].split('-')[0]}",
                         "Auction": auction,
                         "Lot": lot,
                         "Bid": bid['Bid Count'],
                         "Bidding Details": bid['Bidder'],
                         "Bid Time": bid['Bidding Time'],
-                        "Bid Price": bid['Bidding Price'],
-                        "Bid Qty": bid['Bid Quantity'],
-                        "Win Qty": bid['Win Quantity']
+                        "Bid Price": float(bid['Bidding Price'].replace("$", "").replace("AU", "").replace(" ", "").replace(",", "").strip()),
+                        "Bid Qty": int(bid['Bid Quantity'].strip()),
+                        "Win Qty": int(bid['Win Quantity'].strip())
                     })
 
     if len(bidding_list) > 0:
-            try:
+        try:
             if CONFIG_DATA['output'] == 'csv':
                 pd.DataFrame(bidding_list).to_csv(f"{workbook.split('.')[0]}__bids.csv", index=False)
             elif CONFIG_DATA['output'] == 'excel':
