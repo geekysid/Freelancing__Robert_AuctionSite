@@ -28,6 +28,7 @@ CONFIG_DATA = {}
 WAIT_TIME = 5
 BROWSER = ''
 INVALID_URL = 0
+CURRENT_URL = ''
 
 
 # just fro decoration
@@ -280,6 +281,7 @@ def get_auction_details(selector, lot_number):
         DATA[BROWSER.current_url.rsplit("/", 1)[-1]]['auction_details'] = {
             "Lot Number": lot_number,
             "Title": title,
+            "url": BROWSER.current_url,
             "Status": status,
             "Winning Bid": winning_bid,
             "Quantity": lot_qty,
@@ -300,57 +302,57 @@ def get_auction_details(selector, lot_number):
 
 
 # Writing data to excel
-def write_to_excel(worksheet, data_list):
+def write_to_excel(worksheet, data_list, item='bid'):
 
     # Write headers
     col = 0
-    worksheet.write(0, 0, 'Start')
-    worksheet.write(0, 1, 'Quanitity')
     for key in data_list[0].keys():
-        worksheet.write(0, col, key)
-        col += 1
-
-    # Write Data
+        # if key == 'Item Name':
+        #     worksheet.write(0, col, key)
+        #     col += 2
+        if key == 'url':
+            continue
+        else:
+            worksheet.write(0, col, key)
+            col += 1
 
     # Write list data
     col = 0
-    for i, data_dict in enumerate(data_list, start=1):
+    for row, data_dict in enumerate(data_list, start=1):
         col = 0
         for key in data_dict.keys():
-            worksheet.write(i, col, data_dict[key])
+            if key == 'Item Name':
+                worksheet.write_url(row, col, data_dict['url'], string=data_dict[key])
+            elif key == 'url':
+                continue
+            else:
+                worksheet.write(row, col, data_dict[key])
             col += 1
-
-    # col = 0
-    # row = 0
-    # for d in data_list:
-    #     for key in d.keys():
-    #         row += 1
-    #         worksheet.write(row, col, key)
-    #         for item in d[key]:
-    #             worksheet.write(row, col + 1, item)
-    #             row += 1
 
 
 # function that fetches required auction datapoints from json and generates a csv
 def generate_auction_file(workbook):
     auction_list = []
+
     for key in DATA.keys():
         if DATA[key] == "Page dosen't exists":
             continue
         else:
+            auction_details = DATA[key]['auction_details'] 
             auction_list.append({
-                "Closed": DATA[key]['auction_details']['Status'],
-                "Auction-Lot": f"{DATA[key]['auction_details']['Lot Number'].split('-')[-1]}-{DATA[key]['auction_details']['Lot Number'].split('-')[0]}",
-                "Auction": DATA[key]['auction_details']['Lot Number'].split('-')[-1],
-                "Lot": DATA[key]['auction_details']['Lot Number'].split('-')[0],
+                "Closed": auction_details['Status'],
+                "Auction-Lot": f"{auction_details['Lot Number'].split('-')[-1]}-{auction_details['Lot Number'].split('-')[0]}",
+                "Auction": auction_details['Lot Number'].split('-')[-1],
+                "Lot": auction_details['Lot Number'].split('-')[0],
                 "Part": DATA[key]['laptop_details']['Part Number'].split(" ")[0].strip() if CONFIG_DATA['strip_part_number'] else DATA[key]['laptop_details']['Part Number'],
-                "Item Name": DATA[key]['auction_details']['Title'],
-                "Bid": float(DATA[key]['auction_details']['Winning Bid'].replace("$", "").replace("AU", "").replace(" ", "").replace(",", '').strip()),
-                "Condition": DATA[key]['auction_details']['Lot Condition'],
-                "Buyers Premium": DATA[key]['auction_details']['Lot Premium'],
-                "GST": DATA[key]['auction_details']['Lot GST'],
-                "Warranty": DATA[key]['auction_details']['Lot Warranty'],
-                "Deliver To": DATA[key]['auction_details']['Lot Delivery'],
+                "Item Name": auction_details['Title'],
+                "url": auction_details['url'],
+                "Bid": float(auction_details['Winning Bid'].replace("$", "").replace("AU", "").replace(" ", "").replace(",", '').strip()),
+                "Condition": auction_details['Lot Condition'],
+                "Buyers Premium": auction_details['Lot Premium'],
+                "GST": auction_details['Lot GST'],
+                "Warranty": auction_details['Lot Warranty'],
+                "Deliver To": auction_details['Lot Delivery'],
                 "Processor": DATA[key]['laptop_details']['Processor'],
                 "Memory": DATA[key]['laptop_details']['Memory'],
                 "Storage": DATA[key]['laptop_details']['Storage']
@@ -361,8 +363,9 @@ def generate_auction_file(workbook):
                 pd.DataFrame(auction_list).to_csv(f"{workbook.split('.')[0]}__auctioncsv", index=False)
             elif CONFIG_DATA['output'] == 'excel':
                 worksheet = workbook.add_worksheet('Auction Data')
-                write_to_excel(worksheet, auction_list)
+                write_to_excel(worksheet, auction_list, item='auction')
                 cprint(f'          ✅ Saved auction data to Excel file', 'green', attrs=['bold'])
+                # cprint(f" Current URl = {CURRENT_URL}")
         except Exception as err:
             cprint(f'          ❌ Exception while trying to save auction data into file.', 'red', attrs=['bold'])
             cprint(f'          ❌ Exception: {str(err)}', 'red', attrs=['bold'])
@@ -416,7 +419,9 @@ def save_data_JSON(file):
 
 # generating auction url using Lot number and auction  number
 def generate_auctionUrl(selector, auction, start, end):
+    global CURRENT_URL
     base_url = 'http://www.grays.com/lot'
+
     for i in range(start, end+1, 1):
         auction_string = f'{i:04}-{auction}'
         url = f'{base_url}/{auction_string}'
@@ -432,7 +437,7 @@ def generate_auctionUrl(selector, auction, start, end):
         save_data_JSON(f'Data/{auction}.json')
 
         workbook = xlsxwriter.Workbook(f'Data/{auction}.xlsx') if CONFIG_DATA['output'].lower()  == 'excel' else None
-        file = f'Data/{auction}.json' if CONFIG_DATA['output'] == 'csv' else workbook
+        file = workbook if CONFIG_DATA['output'].lower() == 'excel' else f'Data/{auction}.json'
 
         generate_auction_file(file)
         generate_bidding_file(file)
