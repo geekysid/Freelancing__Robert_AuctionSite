@@ -200,7 +200,7 @@ def get_autioned_laptop_details(selector):
             memory = text
 
         if check_if_substring_exists(CONFIG_DATA['Part'], text):
-            part = text.split(': ')[-1]
+            part = text.split(": ")[-1].split(" ")[0] if text else None
 
         if check_if_substring_exists(CONFIG_DATA['Storage'], text):
             processor = text
@@ -338,13 +338,13 @@ def generate_auction_file(workbook):
         if DATA[key] == "Page dosen't exists":
             continue
         else:
-            auction_details = DATA[key]['auction_details'] 
+            auction_details = DATA[key]['auction_details']
             auction_list.append({
                 "Closed": auction_details['Status'],
                 "Auction-Lot": f"{auction_details['Lot Number'].split('-')[-1]}-{auction_details['Lot Number'].split('-')[0]}",
                 "Auction": auction_details['Lot Number'].split('-')[-1],
                 "Lot": auction_details['Lot Number'].split('-')[0],
-                "Part": DATA[key]['laptop_details']['Part Number'].split(" ")[0].strip() if CONFIG_DATA['strip_part_number'] else DATA[key]['laptop_details']['Part Number'],
+                "Part": DATA[key]['laptop_details']['Part Number'],
                 "Item Name": auction_details['Title'],
                 "url": auction_details['url'],
                 "Bid": float(auction_details['Winning Bid'].replace("$", "").replace("AU", "").replace(" ", "").replace(",", '').strip()),
@@ -448,7 +448,7 @@ def generate_auctionUrl(selector, auction, start, end):
         if INVALID_URL == 5:
             break
 
-        print('\n----------------\n')
+        print()
 
 
 # getting required data from website
