@@ -115,7 +115,7 @@ def get_element(selector, base=''):
             return base.find_element_by_tag_name(selector[selector_type])
     except Exception as err:
         # cprint(f'    [x] Exeption: Can\'t locate selector. \n{str(err)}', 'red', attrs=['bold'])
-        pass
+        return False
 
 
 # getting elements from config
@@ -192,31 +192,44 @@ def get_bidding_details(selector):
 def get_autioned_laptop_details(selector):
     description = get_element(selector['lot-description']).find_elements_by_tag_name('li')
     laptop_details = {}
-    memory = part = processor = storage = None
+    memory = None
+    part = None
+    processor = None
+    storage = None
 
     for desc in description:
         text = desc.text
         if check_if_substring_exists(CONFIG_DATA['Memory'], text):
-            memory = text
+            memory = text.replace(":", '')
 
         if check_if_substring_exists(CONFIG_DATA['Part'], text):
-            part = text.split(": ")[-1].split(" ")[0] if text else None
-
-        if check_if_substring_exists(CONFIG_DATA['Storage'], text):
-            processor = text
+            if text:
+                # print(-1, text)
+                part = text.split("Part Number")[-1].strip()
+                # print(0, part)
+                part = part.split("Part No")[-1].strip()
+                # print(1, part)
+                part = part.replace(":", "").strip()
+                # print(2, part)
+                part = part.split(" ")[0]
+                # print(3, part)
+                # input(4)
 
         if check_if_substring_exists(CONFIG_DATA['Processor'], text):
-            storage = text
+            processor = text.replace("Processor", "").replace(":", "").strip()
+
+        if check_if_substring_exists(CONFIG_DATA['Storage'], text) and "Part" not in text:
+            storage = text.replace(":", '')
 
     cprint(f'          [>>] Memory: {memory}', 'cyan', attrs=['bold'])
-    cprint(f'          [>>] Storage: {processor}', 'cyan', attrs=['bold'])
-    cprint(f'          [>>] Processor: {storage}', 'cyan', attrs=['bold'])
+    cprint(f'          [>>] Storage: {storage}', 'cyan', attrs=['bold'])
+    cprint(f'          [>>] Processor: {processor}', 'cyan', attrs=['bold'])
     cprint(f'          [>>] Part Number: {part}', 'cyan', attrs=['bold'])
 
     laptop_details['Memory'] = memory
     laptop_details['Part Number'] = part
-    laptop_details['Storage'] = processor
-    laptop_details['Processor'] = storage
+    laptop_details['Storage'] = storage
+    laptop_details['Processor'] = processor
 
     DATA[BROWSER.current_url.rsplit("/", 1)[-1]]['laptop_details'] = laptop_details
 
@@ -243,8 +256,7 @@ def get_auction_details(selector, lot_number):
         # checking if auction is closed
         has_closed = False
         try:
-            get_element(selector["has_closed"])
-            has_closed = True
+            has_closed = True if get_element(selector["has_closed"]) else False
         except:
             pass
         title = get_element(selector["laptop_title"]).text
@@ -420,6 +432,7 @@ def save_data_JSON(file):
 # generating auction url using Lot number and auction  number
 def generate_auctionUrl(selector, auction, start, end):
     global CURRENT_URL
+
     base_url = 'http://www.grays.com/lot'
 
     for i in range(start, end+1, 1):
@@ -445,30 +458,33 @@ def generate_auctionUrl(selector, auction, start, end):
         if CONFIG_DATA['output'].lower() == 'excel':
             workbook.close()
 
-        if INVALID_URL == 5:
-            break
+        # if INVALID_URL == 5:
+        #     break
 
         print()
 
 
 # getting required data from website
 def get_required_data():
+    global DATA
     selector = CONFIG_DATA['selectors']
+
     for auction in CONFIG_DATA['auction_and_lot_details']:
+        DATA  = {}
         generate_auctionUrl(selector, *auction)
 
 
 # executing script only if its not imported
 if __name__ == '__main__':
-    try:
+    # try:
         init()
         intro_deco()
         if initializer():
             get_browser(headless=False)
             get_required_data()
             BROWSER.quit()
-    except Exception as error:
-        # input("TTTTTTTTTTTTTTTTTTTTTTT")
-        if BROWSER:
-            BROWSER.quit()
-        cprint(f'  [+] EXCEPTION: {str(error)}', 'red', attrs=['bold'])
+    # except Exception as error:
+    #     # input("TTTTTTTTTTTTTTTTTTTTTTT")
+    #     if BROWSER:
+    #         BROWSER.quit()
+    #     cprint(f'  [+] EXCEPTION: {str(error)}', 'red', attrs=['bold'])

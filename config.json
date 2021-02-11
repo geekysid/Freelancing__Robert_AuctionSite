@@ -1,19 +1,90 @@
 {
   "base_url": "https://www.grays.com/",
   "auction_and_lot_details": [
-    [ 2182517, 1, 100 ],
-    [ 2182521, 1, 100 ],
-    [ 2182519, 1, 100 ],
-    [ 2182516, 1, 100 ],
-    [ 2182518, 1, 100 ],
-    [ 2182525, 1, 100 ],
-    [ 2182520, 1, 100 ]
+    [
+      2182306,
+      1,
+      100
+    ],
+    [
+      2182517,
+      1,
+      100
+    ],
+    [
+      2182620,
+      1,
+      100
+    ],
+    [
+      2182305,
+      1,
+      100
+    ],
+    [
+      2182504,
+      1,
+      100
+    ],
+    [
+      2182381,
+      1,
+      100
+    ],
+    [
+      2182385,
+      1,
+      100
+    ],
+    [
+      2182380,
+      1,
+      100
+    ],
+    [
+      2182384,
+      1,
+      100
+    ],
+    [
+      2182307,
+      1,
+      100
+    ]
   ],
   "strip_part_number": true,
   "output": "excel",
-  "Processor": [ "core", "GHz", "Core" ],
-  "Memory": [ "RAM" ],
-  "Storage": [ "Hard Drive", "Hard Drives", "Storage", "SSD", "Solid State Drive", "Solid State Drives", "GB", "TB" ],
-  "Part": [ "Part Number", "Part No", "Part Num" ],
-  "url": [ "https://www.grays.com/computers-and-electronics/computers-and-it-equipment/laptops?item-type=auction" ]
+  "Processor": [
+    "core",
+    "Core",
+    "Intel",
+    "AMD",
+    "Ryzen",
+    "Xeon",
+    "Qualcomm",
+    "Snapdragon",
+    "CPU",
+    "Pentium"
+  ],
+  "Memory": [
+    "RAM"
+  ],
+  "Storage": [
+    "Hard Drive",
+    "Hard Drives",
+    "Storage",
+    "SSD",
+    "Solid State Drive",
+    "Solid State Drives",
+    "GB",
+    "TB"
+  ],
+  "Part": [
+    "Part Number",
+    "Part No",
+    "Part Num"
+  ],
+  "url": [
+    "https://www.grays.com/computers-and-electronics/computers-and-it-equipment/laptops?item-type=auction"
+  ]
 }
