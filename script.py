@@ -262,8 +262,23 @@ def get_auction_details(selector, lot_number):
         title = get_element(selector["laptop_title"]).text
         closed_on = get_element(selector["lot-closed-on"]).text if has_closed else 'Auction is Live'
         closing_in = 'Closed' if has_closed else get_element(selector["lot-closing-countdown"]).text
-        status = get_element(selector["lot-closed-on"]).text if has_closed else get_element(selector["lot-closing-countdown"]).text
+
+        if has_closed:
+            status = get_element(selector["lot-closed-on"]).text
+        else: 
+            if CONFIG_DATA['OpenAuctionText'].lower() == 'time':
+                status = f'Closing in {get_element(selector["lot-closing-countdown"]).text}'
+            elif CONFIG_DATA['OpenAuctionText'].lower() == 'live':
+                status = 'Live'
+            elif CONFIG_DATA['OpenAuctionText'].lower() == 'bool':
+                status = 'No'
+            else:
+                status = 'On Going'
+
+        # status = get_element(selector["lot-closed-on"]).text if has_closed else get_element(selector["lot-closing-countdown"]).text
         # status = 'Closed' if has_closed else 'On Going'
+        
+        
         winning_bid = get_element(selector["current-bid"]).text
         lot_qty = get_element(selector["lot-quantity"]).text
         lot_number = lot_number
